@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>Wiki to PDF</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <h2>Welcome to wiki to PDF app</h2>
+        <form action="">
+            <input type="text" name="searchTerm" id="searchTermInput">
+            <button id="searchButton" type="button">Search</button>
+        </form>
+        <div id="suggestions">
+
+        </div>
+    </body>
+    <script>
+        function parseKeys(data){
+            let html = '<ul>'
+            for(i=0; i<data.length; i++) {
+                let path = '/app/article/display/?article='+data[i];
+                html = html+'<li>'+'<a href='+path+'>'+data[i]+'</a>'+'</li>';
+            }
+            html = html+'</ul>'
+            $('#suggestions').html(html);
+        }
+
+        $('#searchButton').on('click', function(){
+            var searchTerm = $('#searchTermInput').val();
+            $.ajax({
+                url: "{% url 'load_suggestion' %}",
+                method: "GET",
+                data: {
+                    'searchTerm': searchTerm
+                },
+                success: function(data){
+                    let obj = JSON.parse(data);
+                    parseKeys(obj["keys"]);
+                }
+            });
+        });
+    </script>
+</html>

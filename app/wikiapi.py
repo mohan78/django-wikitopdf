@@ -5,6 +5,7 @@ Using this module, one can search wikipedia and get content.
 import requests
 import json
 import bs4
+import wikipedia
 
 class WikiApi:
     """
@@ -29,15 +30,6 @@ class WikiApi:
         return results
 
     def get_article(self, url):
-        response = requests.get(url=url)
-        soup = bs4.BeautifulSoup(response.text, 'html.parser')
-        f = open('result.html', 'wb')
-        f.write(soup.encode('utf-8'))
-        f.close()
-
-
-
-wiki = WikiApi()
-results = wiki.load_suggestions('Apple')
-wiki.get_article(results['Apple'])
+        page = wikipedia.page(url)
+        return page
 
