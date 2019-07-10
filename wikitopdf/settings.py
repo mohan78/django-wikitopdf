@@ -76,12 +76,7 @@ WSGI_APPLICATION = 'wikitopdf.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'wikitopdf',
-        'USER': 'postgres',
-        'PASSWORD': '1397',
-        'HOST': 'localhost',
-        'PORT': ''
+        'ENGINE': 'django.db.backends.sqlite3'
     }
 }
 

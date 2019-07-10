@@ -76,8 +76,8 @@ def get_article(request):
             }
             pdf = render_to_pdf('app/content.html', context)
             response = HttpResponse(pdf, content_type='application/pdf')
-            filename = f'{article}-wiki.pdf'
-            content = f"attachment; filename={filename}"
+            filename = '{}-wiki.pdf'.format(article)
+            content = "attachment; filename={}".format(filename)
             response['Content-Disposition'] = content
             return response
         else:

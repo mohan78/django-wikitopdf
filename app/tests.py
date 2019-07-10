@@ -9,7 +9,7 @@ class ProjectViewTests(TestCase):
     Class to test the views used in the project
     """
     def test_homepage(self):
-        response = client.get('/app/')
+        response = client.get(reverse('homepage'))
         self.assertEqual(response.status_code, 200)
 
     def test_load_suggestions(self):
