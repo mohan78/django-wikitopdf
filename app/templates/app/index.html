@@ -56,7 +56,7 @@
                 <tbody>
             `;
             for(i=0; i<data.length; i++) {
-                let path = `/app/article/display/?article=${encodeURIComponent(data[i][0])}`;
+                let path = `/article/display/?article=${encodeURIComponent(data[i][0])}`;
                 html = html + `<tr>
                 <td>${data[i][0]}</td>
                 <td>${data[i][1]}</td>
