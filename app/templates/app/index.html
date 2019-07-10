@@ -1,42 +1,89 @@
 <html>
     <head>
+        {% load static %}
         <title>Wiki to PDF</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+        <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
     </head>
     <body>
-        <h2>Welcome to wiki to PDF app</h2>
-        <form action="">
-            <input type="text" name="searchTerm" id="searchTermInput">
-            <button id="searchButton" type="button">Search</button>
-        </form>
-        <div id="suggestions">
-
+        <div class="card">
+            <div class="card-header">
+                <h5>Welcome to wiki to PDF app</h5>
+                <p>Here you can search wikipedia and download the
+                results as pdf file by clicking download link</p>
+            </div>
+            <div class="card-body">
+                <input type="text" name="searchTerm" id="searchTermInput" class="form-control" placeholder="Start typing here...">
+            </div>
         </div>
+        <!--table is added here dynamically-->
+        <div class="card" style="width:1100px;">
+            <div class="card-body" id="suggestions">
+                <p id="statusMessage" style="text-align:center">Results will be displayed here</p>
+            </div>
+        </div>
+
+    <!-- modals -->
+    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="messageModalLabel">Your download will begin in a moment</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     </body>
+
     <script>
-        function parseKeys(data){
-            let html = '<ul>'
+        //To parse the data and generate table based on the data
+        function parseData(data){
+            let html = `
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <th> Keyword </th>
+                    <th> Summary </th>
+                    <th> Download </th>
+                </thead>
+                <tbody>
+            `;
             for(i=0; i<data.length; i++) {
-                let path = '/app/article/display/?article='+data[i];
-                html = html+'<li>'+'<a href='+path+'>'+data[i]+'</a>'+'</li>';
+                let path = `/app/article/display/?article=${encodeURIComponent(data[i][0])}`;
+                html = html + `<tr>
+                <td>${data[i][0]}</td>
+                <td>${data[i][1]}</td>
+                <td><a href=${path} id="downloadLink">Download</a></td>
+                </tr>`;
             }
-            html = html+'</ul>'
+            html = html+'</tbody></table>'
             $('#suggestions').html(html);
         }
 
-        $('#searchButton').on('click', function(){
+        //Loads the suggestions from wikipedia api on every input change
+        $('#searchTermInput').on('keyup change', function(){
             var searchTerm = $('#searchTermInput').val();
-            $.ajax({
-                url: "{% url 'load_suggestion' %}",
-                method: "GET",
-                data: {
-                    'searchTerm': searchTerm
-                },
-                success: function(data){
-                    let obj = JSON.parse(data);
-                    parseKeys(obj["keys"]);
-                }
-            });
+            if (searchTerm.length != 0) {
+                $.ajax({
+                    url: "{% url 'load_suggestion' %}",
+                    method: "GET",
+                    data: {
+                        'searchTerm': searchTerm
+                    },
+                    success: function(data){
+                        let obj = JSON.parse(data);
+                        suggestions = obj["suggestions"];
+                        parseData(suggestions);
+                    }
+                });
+            }
         });
     </script>
 </html>

@@ -1,10 +1,10 @@
 """
-Using this module, one can search wikipedia and get content.
+Using this module, one can search wikipedia and get content for a given article name.
+Uses wikipedia package to get data from wikipedia API
 """
 
 import requests
 import json
-import bs4
 import wikipedia
 
 class WikiApi:
@@ -17,19 +17,42 @@ class WikiApi:
     }
 
     def load_suggestions(self, search_term):
+        """
+        Queries the wikipedia opensearch API and retreives the links along with
+        matching article names
+
+        :param search_term: search term for which suggestions has to be retreived
+        :return results: nested list of title, summary for the retreived suggestions
+        """
         params = {
             'action': 'opensearch',
             'search': search_term,
+            'limit' : 50,
             'format': 'json'
         }
         response = requests.get(url=self.url, headers=self.headers, params=params)
         suggestions = json.loads(response.text)
-        results = {}
-        for title, link in zip(suggestions[1], suggestions[3]):
-            results[title] = link
+        results = []
+        try:
+            for title, summary in zip(suggestions[1], suggestions[2]):
+                results.append([title, summary])
+        except KeyError:
+            results = []
         return results
 
-    def get_article(self, url):
-        page = wikipedia.page(url)
-        return page
+    def get_article(self, article_name):
+        """
+        Fetches the article from the wikipedia
 
+        :param article_name: Article for which data has to be retreived
+        :return: page object containing the retreived data
+        """
+        try:
+            page = wikipedia.page(article_name)
+            return page
+        except wikipedia.exceptions.WikipediaException:
+            print("Please provide an article name")
+            return None
+
+x = WikiApi()
+x.load_suggestions('')
